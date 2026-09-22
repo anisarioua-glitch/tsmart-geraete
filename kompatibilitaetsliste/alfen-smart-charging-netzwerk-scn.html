@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alfen Eve Integration in thermondo smart</title>
+    <style>
+        :root {
+            --primary: #ff5b29;
+            --primary-dark: #e04a1b;
+            --bg: #fafafa;
+            --card-bg: #ffffff;
+            --text: #222222;
+            --text-muted: #666666;
+            --border: #dddddd;
+            --success: #2e7d32;
+            --success-bg: #e8f5e9;
+            --info: #1976d2;
+            --info-bg: #e3f2fd;
+            --warning: #c62828;
+            --warning-bg: #ffebee;
+            --focus-ring: 0 0 0 3px rgba(255, 91, 41, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .layout {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .nav-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .nav-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .nav-list a {
+            display: block;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: var(--bg);
+            border-left: 4px solid var(--primary);
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .nav-list a:hover {
+            background: #f0f0f0;
+            text-decoration: none;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ol, ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid;
+        }
+
+        .alert-warning {
+            background-color: var(--warning-bg);
+            border-left-color: var(--warning);
+            color: #5c0000;
+        }
+
+        .alert-info {
+            background-color: var(--info-bg);
+            border-left-color: var(--info);
+            color: #0d3c61;
+        }
+
+        .alert-success {
+            background-color: var(--success-bg);
+            border-left-color: var(--success);
+            color: #1b5e20;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        /* Interactive SVG & Animation Styles */
+        .interactive-container {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #fcfcfc;
+            margin: 1.5rem 0;
+        }
+
+        .svg-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #666666;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444444;
+        }
+
+        .status-bar {
+            background: #333;
+            color: #fff;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.95rem;
+            text-align: center;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive Layout */
+        @media (min-width: 900px) {
+            .layout {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+
+            .nav-card {
+                width: 300px;
+                position: sticky;
+                top: 2rem;
+                flex-shrink: 0;
+            }
+
+            main {
+                flex-grow: 1;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animated-element {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Alfen Eve Ladestationen</h1>
+        <p>Hier erfahren Sie, wie Sie Ihre Alfen Eve S-Line, Pro-Line oder Double Ladestation Schritt für Schritt mit thermondo smart verbinden.</p>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+            
+            <!-- Kapitelnavigation -->
+            <nav class="nav-card" aria-label="Kapitelnavigation">
+                <h2>Kapitel</h2>
+                <ul class="nav-list">
+                    <li><a href="#ueberblick">1. Überblick</a></li>
+                    <li><a href="#voraussetzungen">2. Voraussetzungen</a></li>
+                    <li><a href="#einstellungen">3. Einstellungen am Gerät</a></li>
+                    <li><a href="#anlegen">4. thermondo smart</a></li>
+                    <li><a href="#verbindung">5. Verbindung prüfen</a></li>
+                    <li><a href="#hilfe">6. Hilfe bei Problemen</a></li>
+                </ul>
+            </nav>
+
+            <!-- Hauptinhalt -->
+            <main>
+                
+                <!-- 1. Überblick -->
+                <section id="ueberblick">
+                    <h2>1. Überblick</h2>
+                    
+                    <p>Diese Anleitung beschreibt die vollständige Integration und Konfiguration der folgenden Alfen Ladestationen für die Steuerung durch thermondo smart:</p>
+                    <ul>
+                        <li>Alfen Eve Single S-Line</li>
+                        <li>Alfen Eve Single Pro-Line</li>
+                        <li>Alfen Eve Double</li>
+                    </ul>
+                    <p>Durch die Verbindung kann thermondo smart den Ladevorgang Ihres Elektrofahrzeugs intelligent steuern, um beispielsweise bevorzugt eigenen Solarstrom zu nutzen.</p>
+                </section>
+
+                <!-- 2. Voraussetzungen -->
+                <section id="voraussetzungen">
+                    <h2>2. Voraussetzungen</h2>
+                    
+                    
+                    <div class="alert alert-warning">
+                        <strong>Wichtiger Lizenzhinweis:</strong><br>
+                        Um die Steuerung durch thermondo smart zu ermöglichen, müssen die Alfen Ladestationen über die entsprechenden Lizenzen verfügen:
+                        <ul>
+                            <li><strong>LBA (Load Balancing Active):</strong> Für die individuelle Steuerung (als einzelne "Ladestation").</li>
+                            <li><strong>SCN (Smart Charging Network):</strong> Für die Einbindung als "Ladesystem".</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>Empfehlung für die Inbetriebnahme:</strong><br>
+                        Wir empfehlen, die Inbetriebnahme der Ladestation mit der <strong>ACE Service Installer Software</strong> durchzuführen. Die Zugangsdaten erhalten Sie direkt von Alfen.
+                    </div>
+
+                    <p>Stellen Sie sicher, dass folgende Punkte erfüllt sind, bevor Sie mit der Einrichtung beginnen:</p>
+                    <ul>
+                        <li>Die Ladestation ist montiert und ordnungsgemäß elektrisch angeschlossen.</li>
+                        <li>Die Ladestation ist per Netzwerkkabel (Ethernet) in Ihr Heimnetzwerk eingebunden.</li>
+                        <li>Sie haben einen Windows-PC mit installierter <strong>ACE Service Installer Software</strong> und Administratorrechten zur Hand.</li>
+                        <li>Sie haben die Zugangsdaten für die Software von Alfen erhalten.</li>
+                    </ul>
+                </section>
+
+                <!-- 3. Einstellungen am Gerät -->
+                <section id="einstellungen">
+                    <h2>3. Einstellungen am Gerät</h2>
+                    
+                    
+                    <h3>Schritt 1: Verbindung mit dem ACE Service Installer herstellen</h3>
+                    <ol>
+                        <li>Verbinden Sie die Alfen Ladestation mit Ihrem Netzwerk und Ihrem Laptop.</li>
+                        <li>Öffnen und melden Sie sich in der <strong>ACE Service Installer</strong> Software an.</li>
+                        <li>Schließen und öffnen Sie die Software erneut, bis das Update-Fenster erscheint.</li>
+                        <li>Aktualisieren Sie die <strong>ACE Service Installer Software</strong>.</li>
+                        <li>Nach dem Software-Update und der Anmeldung sollte die Alfen Ladestation oben links im Fenster angezeigt werden. Falls nicht, schließen Sie die Software erneut und versuchen Sie, das Update nochmals durchzuführen.</li>
+                    </ol>
+
+                    <div class="alert alert-info">
+                        <strong>Mögliche Fehlerursachen bei der Verbindung:</strong>
+                        <ul>
+                            <li>Das Software-Update funktioniert nur mit einem <strong>Windows PC</strong> und mit <strong>Administratorrechten</strong>.</li>
+                            <li>Prüfen Sie, ob die Alfen Ladestation mit dem Netzwerk verbunden ist.</li>
+                            <li>Versuchen Sie, die Alfen Ladestation direkt mit einem <strong>RJ45-Kabel</strong> an Ihren Laptop anzuschließen.</li>
+                            <li>Schließen Sie die Anwendung und starten Sie Ihren PC neu.</li>
+                            <li><strong>Achtung:</strong> Eine VPN-Verbindung muss unbedingt <strong>deaktiviert</strong> sein.</li>
+                        </ul>
+                    </div>
+
+                    <h3>Schritt 2: Einstellungen im ACE Service Installer anpassen</h3>
+                    <p>Sobald die Verbindung steht, führen Sie die folgenden Schritte in der Software durch:</p>
+                    
+                    <ol>
+                        <li>Navigieren Sie zu <strong>"License Key"</strong>.</li>
+                        <li>Geben Sie unter <strong>"Feature license key"</strong> den Schlüssel für die <strong>"Active balancing"</strong>-Lizenz ein.</li>
+                        <li>Stellen Sie sicher, dass die <strong>"Object ID"</strong> mit der <strong>"Object Number"</strong> übereinstimmt. <em>(Hinweis: Die Lizenz für das "Active balancing" muss mindestens 48 Stunden im Voraus bei Alfen bestellt werden.)</em></li>
+                        <li>Klicken Sie auf <strong>"Update license key"</strong> und bestätigen Sie mit <strong>"OK"</strong>.</li>
+                    </ol>
+
+                    <!-- Interaktive Sequenz / Animation -->
+                    <div class="interactive-container">
+                        <h3>Interaktive Konfigurations-Vorschau</h3>
+                        <p>Klicken Sie auf "Sequenz starten", um den Ablauf der Einstellungen in der Software-Oberfläche Schritt für Schritt nachzuvollziehen.</p>
+                        
+                        <div class="svg-wrapper">
+                            <svg viewBox="0 0 600 350" width="100%" height="100%" id="installer-svg" aria-label="Nachbildung der ACE Service Installer Oberfläche">
+                                <!-- Background / Window -->
+                                <rect x="10" y="10" width="580" height="330" rx="6" fill="#f0f0f0" stroke="#cccccc" stroke-width="2"/>
+                                <!-- Title Bar -->
+                                <rect x="10" y="10" width="580" height="35" rx="6" fill="#dddddd" />
+                                <circle cx="30" cy="27" r="6" fill="#ff5f56" />
+                                <circle cx="50" cy="27" r="6" fill="#ffbd2e" />
+                                <circle cx="70" cy="27" r="6" fill="#27c93f" />
+                                <text x="95" y="32" font-family="sans-serif" font-size="12" fill="#333333" font-weight="bold">ACE Service Installer</text>
+
+                                <!-- Sidebar -->
+                                <rect x="10" y="45" width="150" height="295" fill="#e4e4e4" stroke="#cccccc" />
+                                <text x="20" y="75" font-family="sans-serif" font-size="12" fill="#333333" font-weight="bold">Menü</text>
+                                
+                                <!-- Sidebar Items -->
+                                <rect id="menu-license" x="15" y="90" width="140" height="30" rx="4" fill="#dddddd" />
+                                <text x="25" y="110" font-family="sans-serif" font-size="12" fill="#222222">License Key</text>
+
+                                <rect id="menu-balancing" x="15" y="130" width="140" height="30" rx="4" fill="#e4e4e4" />
+                                <text x="25" y="150" font-family="sans-serif" font-size="12" fill="#222222">Load Balancing</text>
+
+                                <rect id="menu-ems" x="15" y="170" width="140" height="30" rx="4" fill="#e4e4e4" />
+                                <text x="25" y="190" font-family="sans-serif" font-size="12" fill="#222222">TCP/IP EMS</text>
+
+                                <rect id="menu-auth" x="15" y="210" width="140" height="30" rx="4" fill="#e4e4e4" />
+                                <text x="25" y="230" font-family="sans-serif" font-size="12" fill="#222222">Authorization</text>
+
+                                <!-- Main Content Area -->
+                                <rect x="165" y="50" width="420" height="285" fill="#ffffff" rx="4" stroke="#dddddd" />
+                                
+                                <!-- Dynamic Content Group -->
+                                <g id="dynamic-content">
+                                    <!-- Step 1: License Key View -->
+                                    <text x="185" y="85" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333333">Lizenzschlüssel aktivieren</text>
+                                    <text x="185" y="120" font-family="sans-serif" font-size="12" fill="#666666">Feature license key:</text>
+                                    <rect x="185" y="130" width="300" height="30" rx="4" fill="#ffffff" stroke="#cccccc" />
+                                    <text id="license-input-text" x="195" y="150" font-family="monospace" font-size="12" fill="#999999">[Kein Schlüssel eingetragen]</text>
+                                    
+                                    <!-- Update Button -->
+                                    <rect id="btn-update-license" x="185" y="180" width="150" height="35" rx="4" fill="#cccccc" />
+                                    <text x="210" y="202" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff">Update license key</text>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div class="controls">
+                            <button class="btn" id="btn-start">Sequenz starten</button>
+                            <button class="btn btn-secondary" id="btn-reset">Zurücksetzen</button>
+                        </div>
+                        <div class="status-bar" id="status-text">Bereit. Klicken Sie auf "Sequenz starten".</div>
+                    </div>
+
+                    <h3>Zusammenfassung der einzutragenden Werte</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bereich / Tab</th>
+                                    <th>Einstellungsfeld</th>
+                                    <th>Wert / Bedeutung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>License Key</strong></td>
+                                    <td>Feature license key</td>
+                                    <td>Ihr persönlicher "Active balancing" Lizenzschlüssel von Alfen</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Load Balancing</strong></td>
+                                    <td>Load Balancing aktivieren</td>
+                                    <td>Aktivieren Sie das Kontrollkästchen. Die Ampere-Angabe variiert je nach Hausanschluss.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TCP/IP EMS</strong></td>
+                                    <td>EMS Konfiguration</td>
+                                    <td>Passen Sie die IP- und Port-Einstellungen für das Energiemanagementsystem an.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Authorization</strong></td>
+                                    <td>Autorisierungsmethode</td>
+                                    <td>Stellen Sie die gewünschte Autorisierung ein und notieren Sie sich die IP-Adresse der Alfen.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 4. Anlegen in thermondo smart -->
+                <section id="anlegen">
+                    <h2>4. Einbindung in thermondo smart</h2>
+                    
+                    <p>Nachdem die Ladestation im lokalen Netzwerk konfiguriert ist, binden Sie diese in die thermondo smart App ein:</p>
+                    <ol>
+                        <li>Öffnen Sie die thermondo smart App auf Ihrem Smartphone oder PC.</li>
+                        <li>Navigieren Sie zu <strong>"Geräte" &rarr; "Autoladestation" &rarr; "Alfen EVE"</strong>.</li>
+                        <li>Geben Sie die zuvor notierte IP-Adresse Ihrer Alfen Ladestation ein.</li>
+                    </ol>
+
+                    <div class="alert alert-info">
+                        <strong>Besonderheit bei der Alfen Eve Double:</strong><br>
+                        Die Alfen Eve Double muss in thermondo smart <strong>zweimal erfasst</strong> werden (einmal pro Ladepunkt), falls beide Ausgänge gesteuert werden sollen. Mit der <strong>Device-ID</strong> wird dann festgelegt, welcher Ausgang gesteuert wird (1 oder 2).
+                    </div>
+                </section>
+
+                <!-- 5. Verbindung prüfen -->
+                <section id="verbindung">
+                    <h2>5. Verbindung prüfen</h2>
+                    <p>Um sicherzustellen, dass die Kommunikation zwischen thermondo smart und Ihrer Alfen Eve einwandfrei funktioniert, prüfen Sie folgende Punkte:</p>
+                    <ul>
+                        <li>Wird der Status der Ladestation in der thermondo smart App als "Online" oder "Verbunden" angezeigt?</li>
+                        <li>Werden aktuelle Messwerte (z. B. die aktuelle Ladeleistung) korrekt in der App visualisiert?</li>
+                        <li>Starten Sie testweise einen Ladevorgang über die App, um die Steuerbarkeit zu verifizieren.</li>
+                    </ul>
+                </section>
+
+                <!-- 6. Hilfe bei Problemen -->
+                <section id="hilfe">
+                    <h2>6. Hilfe bei Problemen</h2>
+                    
+                    
+                    <h3>Häufige Fragen und Lösungen</h3>
+                    
+                    <p><strong>Die Ladestation wird im ACE Service Installer nicht angezeigt.</strong><br>
+                    Überprüfen Sie, ob Ihr Laptop und die Ladestation im selben Netzwerkbereich sind. Deaktivieren Sie alle aktiven VPN-Verbindungen auf Ihrem Laptop. Starten Sie die Software und ggf. Ihren PC neu.</p>
+
+                    <p><strong>Die Option "Active balancing" lässt sich nicht aktivieren.</strong><br>
+                    Stellen Sie sicher, dass Sie den korrekten Lizenzschlüssel von Alfen erworben und eingetragen haben. Die Freischaltung durch Alfen kann nach der Bestellung bis zu 48 Stunden dauern.</p>
+
+                    <p><strong>thermondo smart kann keine Verbindung zur Ladestation herstellen.</strong><br>
+                    Prüfen Sie, ob sich die IP-Adresse der Ladestation geändert hat. Wir empfehlen, der Ladestation in Ihrem Router eine feste (statische) IP-Adresse zuzuweisen, damit diese immer unter derselben Adresse erreichbar bleibt.</p>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Animation Logic
+        const btnStart = document.getElementById('btn-start');
+        const btnReset = document.getElementById('btn-reset');
+        const statusText = document.getElementById('status-text');
+        const dynamicContent = document.getElementById('dynamic-content');
+        
+        const menuLicense = document.getElementById('menu-license');
+        const menuBalancing = document.getElementById('menu-balancing');
+        const menuEms = document.getElementById('menu-ems');
+        const menuAuth = document.getElementById('menu-auth');
+
+        let animationTimeout;
+
+        function resetAnimation() {
+            clearTimeout(animationTimeout);
+            statusText.textContent = 'Bereit. Klicken Sie auf "Sequenz starten".';
+            
+            // Reset menu highlights
+            menuLicense.setAttribute('fill', '#dddddd');
+            menuBalancing.setAttribute('fill', '#e4e4e4');
+            menuEms.setAttribute('fill', '#e4e4e4');
+            menuAuth.setAttribute('fill', '#e4e4e4');
+
+            // Reset main content to Step 1
+            dynamicContent.innerHTML = `
+                <text x="185" y="85" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333333">Lizenzschlüssel aktivieren</text>
+                <text x="185" y="120" font-family="sans-serif" font-size="12" fill="#666666">Feature license key:</text>
+                <rect x="185" y="130" width="300" height="30" rx="4" fill="#ffffff" stroke="#cccccc" />
+                <text id="license-input-text" x="195" y="150" font-family="monospace" font-size="12" fill="#999999">[Kein Schlüssel eingetragen]</text>
+                <rect id="btn-update-license" x="185" y="180" width="150" height="35" rx="4" fill="#cccccc" />
+                <text x="210" y="202" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff">Update license key</text>
+            `;
+        }
+
+        function runAnimation() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                // If user prefers reduced motion, jump straight to the end state
+                showEndState();
+                return;
+            }
+
+            resetAnimation();
+
+            // Step 1: Type License Key
+            statusText.textContent = 'Trage Lizenzschlüssel ein...';
+            animationTimeout = setTimeout(() => {
+                const inputVal = document.getElementById('license-input-text');
+                if (inputVal) {
+                    inputVal.textContent = 'ALF-1234-BAL-ACTIVE';
+                    inputVal.setAttribute('fill', '#222222');
+                }
+                const btnUpdate = document.getElementById('btn-update-license');
+                if (btnUpdate) btnUpdate.setAttribute('fill', '#ff5b29');
+                statusText.textContent = 'Lizenzschlüssel eingetragen. Klicke auf "Update license key"...';
+
+                // Step 2: Switch to Load Balancing
+                animationTimeout = setTimeout(() => {
+                    menuLicense.setAttribute('fill', '#e4e4e4');
+                    menuBalancing.setAttribute('fill', '#dddddd');
+                    statusText.textContent = 'Navigiere zu "Load Balancing"...';
+
+                    dynamicContent.innerHTML = `
+                        <text x="185" y="85" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333333">Load Balancing konfigurieren</text>
+                        <text x="185" y="120" font-family="sans-serif" font-size="12" fill="#666666">Active balancing:</text>
+                        <rect x="185" y="135" width="20" height="20" rx="3" fill="#ffffff" stroke="#cccccc" />
+                        <text id="chk-balancing" x="189" y="151" font-family="sans-serif" font-size="16" font-weight="bold" fill="#ffffff">✓</text>
+                        <text x="215" y="150" font-family="sans-serif" font-size="12" fill="#222222">Aktivieren</text>
+                    `;
+
+                    animationTimeout = setTimeout(() => {
+                        const chk = document.getElementById('chk-balancing');
+                        if (chk) chk.setAttribute('fill', '#ff5b29');
+                        statusText.textContent = 'Load Balancing erfolgreich aktiviert.';
+
+                        // Step 3: Switch to TCP/IP EMS
+                        animationTimeout = setTimeout(() => {
+                            menuBalancing.setAttribute('fill', '#e4e4e4');
+                            menuEms.setAttribute('fill', '#dddddd');
+                            statusText.textContent = 'Navigiere zu "TCP/IP EMS"...';
+
+                            dynamicContent.innerHTML = `
+                                <text x="185" y="85" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333333">TCP/IP EMS Einstellungen</text>
+                                <text x="185" y="120" font-family="sans-serif" font-size="12" fill="#666666">Verbindungsprotokoll:</text>
+                                <rect x="185" y="135" width="200" height="30" rx="4" fill="#ffffff" stroke="#cccccc" />
+                                <text x="195" y="155" font-family="sans-serif" font-size="12" fill="#222222">Modbus TCP/IP</text>
+                            `;
+
+                            // Step 4: Switch to Authorization & End
+                            animationTimeout = setTimeout(() => {
+                                menuEms.setAttribute('fill', '#e4e4e4');
+                                menuAuth.setAttribute('fill', '#dddddd');
+                                statusText.textContent = 'Navigiere zu "Authorization"...';
+
+                                dynamicContent.innerHTML = `
+                                    <text x="185" y="85" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333333">Autorisierung & IP-Adresse</text>
+                                    <text x="185" y="120" font-family="sans-serif" font-size="12" fill="#666666">IP-Adresse der Wallbox:</text>
+                                    <text x="185" y="145" font-family="monospace" font-size="16" font-weight="bold" fill="#ff5b29">192.168.178.45</text>
+                                    <text x="185" y="180" font-family="sans-serif" font-size="11" fill="#666666">* Notieren Sie diese IP für thermondo smart!</text>
+                                `;
+                                statusText.textContent = 'Fertig! Notieren Sie die IP-Adresse für thermondo smart.';
+                            }, 2000);
+                        }, 2000);
+                    }, 1500);
+                }, 2000);
+            }, 2000);
+        }
+
+        function showEndState() {
+            menuLicense.setAttribute('fill', '#e4e4e4');
+            menuAuth.setAttribute('fill', '#dddddd');
+            dynamicContent.innerHTML = `
+                <text x="185" y="85" font-family="sans-serif" font-size="14" font-weight="bold" fill="#333333">Autorisierung & IP-Adresse</text>
+                <text x="185" y="120" font-family="sans-serif" font-size="12" fill="#666666">IP-Adresse der Wallbox:</text>
+                <text x="185" y="145" font-family="monospace" font-size="16" font-weight="bold" fill="#ff5b29">192.168.178.45</text>
+                <text x="185" y="180" font-family="sans-serif" font-size="11" fill="#666666">* Notieren Sie diese IP für thermondo smart!</text>
+            `;
+            statusText.textContent = 'Endzustand geladen. Notieren Sie die IP-Adresse.';
+        }
+
+        btnStart.addEventListener('click', runAnimation);
+        btnReset.addEventListener('click', resetAnimation);
+    </script>
+</body>
+</html>
