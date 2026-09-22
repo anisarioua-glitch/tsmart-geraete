@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APsystems EZ1-M mit thermondo smart verbinden</title>
+    <style>
+        :root {
+            --primary: #ff5b29;
+            --primary-light: #fff0eb;
+            --text: #2d3748;
+            --bg: #f7fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --info: #3182ce;
+            --info-bg: #ebf8ff;
+            --warn: #e53e3e;
+            --warn-bg: #fff5f5;
+            --success: #38a169;
+            --success-bg: #f0fff4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background-color: var(--bg);
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Layout Grid */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 900px) {
+            .layout {
+                grid-template-columns: 280px 1fr;
+            }
+            
+            .sidebar {
+                position: sticky;
+                top: 2rem;
+                height: fit-content;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .nav-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .nav-card h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            color: #718096;
+        }
+
+        .nav-card ul {
+            list-style: none;
+        }
+
+        .nav-card li {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-card a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-card a:hover, .nav-card a:focus {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            outline: none;
+        }
+
+        /* Main Content */
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            scroll-margin-top: 2rem;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        ol, ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: var(--info-bg);
+            border-left-color: var(--info);
+            color: #2b6cb0;
+        }
+
+        .alert-warn {
+            background-color: var(--warn-bg);
+            border-left-color: var(--warn);
+            color: #c53030;
+        }
+
+        .alert-success {
+            background-color: var(--success-bg);
+            border-left-color: var(--success);
+            color: #2f855a;
+        }
+
+        .alert-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        /* SVG & Animation Styles */
+        .interactive-container {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .phone-mockup {
+            width: 280px;
+            height: 480px;
+            background: #1a202c;
+            border-radius: 32px;
+            border: 8px solid #2d3748;
+            margin: 0 auto 1.5rem auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #333;
+            user-select: none;
+        }
+
+        .phone-header {
+            height: 40px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--primary);
+            padding: 0 0.5rem;
+        }
+
+        .phone-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .app-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .app-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+
+        .toggle-switch {
+            width: 40px;
+            height: 20px;
+            background: #cbd5e1;
+            border-radius: 10px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.on {
+            background: var(--success);
+        }
+
+        .toggle-switch.on::after {
+            left: 22px;
+        }
+
+        .status-bar {
+            background: #edf2f7;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #e04a1d;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* Accessibility Focus Outline */
+        a:focus, button:focus {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .toggle-switch, .toggle-switch::after {
+                transition: none !important;
+            }
+            .phone-screen * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1>APsystems EZ1-M</h1>
+            <p>So verbinden Sie Ihren Mikrowechselrichter einfach und schnell mit thermondo smart.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <nav class="nav-card" aria-label="Kapitelnavigation">
+                    <h3>Kapitel</h3>
+                    <ul>
+                        <li><a href="#ueberblick">1. Überblick</a></li>
+                        <li><a href="#voraussetzungen">2. Voraussetzungen</a></li>
+                        <li><a href="#einstellungen-geraet">3. Einstellungen am Gerät</a></li>
+                        <li><a href="#anlegen-thermondo">4. Anlegen in thermondo smart</a></li>
+                        <li><a href="#verbindung-pruefen">5. Verbindung prüfen</a></li>
+                        <li><a href="#hilfe">6. Hilfe bei Problemen</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- 1. Überblick -->
+                <section id="ueberblick">
+                    <h2>1. Überblick</h2>
+                    
+                    <p>Diese Anleitung beschreibt die Integration des Mikrowechselrichters <strong>APsystems EZ1-M</strong> in Ihr thermondo smart System. Durch die Aktivierung der lokalen API-Schnittstelle kann thermondo smart die Erzeugungsdaten Ihres Wechselrichters direkt und ohne Verzögerung auslesen.</p>
+                </section>
+
+                <!-- 2. Voraussetzungen -->
+                <section id="voraussetzungen">
+                    <h2>2. Voraussetzungen</h2>
+                    
+                    
+                    <div class="alert alert-info">
+                        <div class="alert-title">Wichtige Vorbereitung</div>
+                        Richten Sie Ihr Gerät zuerst gemäß der <strong>Schnellstartanleitung von APsystems</strong> ein, um eine korrekte WLAN-Verbindung zu gewährleisten.
+                    </div>
+                    
+                    <p>Bevor Sie mit der Einrichtung in thermondo smart beginnen, stellen Sie bitte sicher, dass:</p>
+                    <ul>
+                        <li>Der Wechselrichter betriebsbereit und mit Ihrem Heimnetzwerk (WLAN) verbunden ist.</li>
+                        <li>Ihr Smartphone oder Computer sich im selben Netzwerk wie der Wechselrichter befindet.</li>
+                    </ul>
+                </section>
+
+                <!-- 3. Einstellungen am Gerät -->
+                <section id="einstellungen-geraet">
+                    <h2>3. Einstellungen am Gerät</h2>
+                    
+                    <p>Damit die Verbindung funktioniert, muss der lokale API-Zugang am EZ1-M einmalig aktiviert werden. Folgen Sie dazu diesen Schritten:</p>
+                    
+                    <ol>
+                        <li>Verbinden Sie sich über die Methode <strong>"Direktanschluss"</strong> mit dem Wechselrichter.</li>
+                        <li>Stellen Sie eine Verbindung zu Ihrem Wechselrichter her.</li>
+                        <li>Wählen Sie das Menü <strong>"Einstellungen"</strong>.</li>
+                        <li>Wechseln Sie zum Abschnitt <strong>"Lokaler Modus"</strong>.</li>
+                        <li>Aktivieren Sie den lokalen Modus und wählen Sie <strong>"Kontinuierlich"</strong>.</li>
+                        <li>Fertig! Notieren Sie sich die <strong>IP-Adresse</strong> für die spätere Konfiguration.</li>
+                    </ol>
+
+                    <!-- Interactive Animation -->
+                    <div class="interactive-container">
+                        <h3>Ablauf-Simulation: Lokalen Modus aktivieren</h3>
+                        <p style="font-size: 0.9rem; color: #718096; margin-bottom: 1rem;">Klicken Sie auf "Simulation starten", um die Schritte auf der Geräteoberfläche anzusehen.</p>
+                        
+                        <div class="phone-mockup">
+                            <div class="phone-screen">
+                                <div class="phone-header">
+                                    <span>APsystems App</span>
+                                    <span style="font-size: 10px; color: #718096;">Direktmodus</span>
+                                </div>
+                                <div class="phone-content" id="phone-content">
+                                    <!-- Screen 1: Start -->
+                                    <div class="app-btn" id="btn-direct">1. Direktanschluss</div>
+                                    <div class="app-btn" id="btn-settings" style="opacity: 0.5;">2. Einstellungen</div>
+                                    <div class="app-btn" id="btn-local" style="opacity: 0.5;">3. Lokaler Modus</div>
+                                    <div class="toggle-container" style="opacity: 0.5;">
+                                        <span>Kontinuierlich</span>
+                                        <div class="toggle-switch" id="sim-toggle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="status-bar" id="status-text">Bereit zum Starten der Simulation.</div>
+                        
+                        <div class="controls">
+                            <button class="btn btn-primary" id="btn-start">Simulation starten</button>
+                            <button class="btn btn-secondary" id="btn-reset">Zurücksetzen</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Anlegen in thermondo smart -->
+                <section id="anlegen-thermondo">
+                    <h2>4. Anlegen in thermondo smart</h2>
+                    <p>Tragen Sie nun die Daten in Ihrem thermondo smart Portal ein:</p>
+                    
+                    <ol>
+                        <li>Wählen Sie in thermondo smart das Gerät <strong>"APsystems EZ1-M"</strong> aus.</li>
+                        <li>Tragen Sie die zuvor notierte <strong>IP-Adresse</strong> ein.</li>
+                        <li>Unter <strong>Device-ID</strong> geben Sie einfach die <strong>"1"</strong> ein.</li>
+                    </ol>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feldname</th>
+                                <th>Einzutragender Wert</th>
+                                <th>Bedeutung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Gerätetyp</strong></td>
+                                <td>APsystems EZ1-M</td>
+                                <td>Auswahl des passenden Treibers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>IP-Adresse</strong></td>
+                                <td><em>Ihre notierte IP-Adresse</em></td>
+                                <td>Die lokale Netzwerkadresse des Wechselrichters (z.B. 192.168.1.100)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Device-ID</strong></td>
+                                <td>1</td>
+                                <td>Standard-Identifikationsnummer für dieses Gerät</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- 5. Verbindung prüfen -->
+                <section id="verbindung-pruefen">
+                    <h2>5. Verbindung prüfen</h2>
+                    <p>Nachdem Sie die Einstellungen gespeichert haben, prüft thermondo smart die Verbindung automatisch. Sobald die Verbindung erfolgreich hergestellt wurde, sehen Sie die aktuellen Erzeugungsdaten Ihres Balkonkraftwerks direkt im Dashboard.</p>
+                    
+                    <div class="alert alert-success">
+                        <div class="alert-title">Empfehlung für einen stabilen Betrieb</div>
+                        Weisen Sie dem Wechselrichter in den Einstellungen Ihres WLAN-Routers (z. B. FRITZ!Box) eine <strong>feste IP-Adresse</strong> zu. Dadurch wird verhindert, dass sich die IP-Adresse bei einem Neustart des Routers ändert und die Verbindung zu thermondo smart unterbrochen wird.
+                    </div>
+                </section>
+
+                <!-- 6. Hilfe bei Problemen -->
+                <section id="hilfe">
+                    <h2>6. Hilfe bei Problemen</h2>
+                    
+                    <div class="alert alert-warn">
+                        <div class="alert-title">Häufiges Problem: Wechselrichter nicht erreichbar</div>
+                        <p><strong>Ursache:</strong> Der lokale Modus wurde nicht auf "Kontinuierlich" gestellt oder der Wechselrichter hat eine neue IP-Adresse erhalten.</p>
+                        <p><strong>Lösung:</strong> Prüfen Sie in der APsystems App, ob der lokale Modus weiterhin aktiv ist. Kontrollieren Sie in Ihrem Router, ob sich die IP-Adresse des Geräts geändert hat, und passen Sie diese ggf. in thermondo smart an.</p>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <div class="alert-title">Keine Datenübertragung bei Dunkelheit</div>
+                        <p><strong>Hinweis:</strong> Mikrowechselrichter schalten sich ab, sobald keine Solarenergie mehr erzeugt wird (nachts). Während dieser Zeit ist das Gerät im Netzwerk offline und thermondo smart kann keine Verbindung herstellen. Dies ist ein normales Verhalten.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Interactive Animation Script
+        const btnStart = document.getElementById('btn-start');
+        const btnReset = document.getElementById('btn-reset');
+        const statusText = document.getElementById('status-text');
+        
+        const btnDirect = document.getElementById('btn-direct');
+        const btnSettings = document.getElementById('btn-settings');
+        const btnLocal = document.getElementById('btn-local');
+        const simToggle = document.getElementById('sim-toggle');
+
+        let animationTimeout;
+
+        // Check for prefers-reduced-motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefersReducedMotion) {
+            // Instantly show final state
+            showEndState();
+        }
+
+        function showEndState() {
+            btnDirect.style.opacity = '1';
+            btnDirect.classList.add('active');
+            btnSettings.style.opacity = '1';
+            btnSettings.classList.add('active');
+            btnLocal.style.opacity = '1';
+            btnLocal.classList.add('active');
+            simToggle.classList.add('on');
+            simToggle.parentElement.style.opacity = '1';
+            statusText.textContent = "Lokaler Modus erfolgreich auf 'Kontinuierlich' gesetzt!";
+        }
+
+        function resetSimulation() {
+            clearTimeout(animationTimeout);
+            btnDirect.style.opacity = '1';
+            btnDirect.classList.remove('active');
+            btnSettings.style.opacity = '0.5';
+            btnSettings.classList.remove('active');
+            btnLocal.style.opacity = '0.5';
+            btnLocal.classList.remove('active');
+            simToggle.classList.remove('on');
+            simToggle.parentElement.style.opacity = '0.5';
+            statusText.textContent = "Bereit zum Starten der Simulation.";
+            btnStart.disabled = false;
+        }
+
+        function startSimulation() {
+            if (prefersReducedMotion) {
+                showEndState();
+                return;
+            }
+
+            btnStart.disabled = true;
+            
+            // Step 1: Direktanschluss
+            statusText.textContent = "Verbinde über Direktanschluss...";
+            btnDirect.classList.add('active');
+            
+            animationTimeout = setTimeout(() => {
+                // Step 2: Einstellungen
+                statusText.textContent = "Öffne Einstellungen...";
+                btnSettings.style.opacity = '1';
+                btnSettings.classList.add('active');
+                
+                animationTimeout = setTimeout(() => {
+                    // Step 3: Lokaler Modus
+                    statusText.textContent = "Navigiere zu 'Lokaler Modus'...";
+                    btnLocal.style.opacity = '1';
+                    btnLocal.classList.add('active');
+                    
+                    animationTimeout = setTimeout(() => {
+                        // Step 4: Aktivieren & Kontinuierlich
+                        statusText.textContent = "Aktiviere 'Kontinuierlich'...";
+                        simToggle.parentElement.style.opacity = '1';
+                        simToggle.classList.add('on');
+                        
+                        animationTimeout = setTimeout(() => {
+                            statusText.textContent = "Fertig! Lokaler Modus ist dauerhaft aktiv.";
+                        }, 1500);
+                    }, 1500);
+                }, 1500);
+            }, 1500);
+        }
+
+        btnStart.addEventListener('click', startSimulation);
+        btnReset.addEventListener('click', resetSimulation);
+    </script>
+</body>
+</html>
