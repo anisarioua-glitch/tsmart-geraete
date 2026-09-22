@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCPP-Wallbox mit thermondo smart verbinden</title>
+    <style>
+        :root {
+            --accent-color: #ff5b29;
+            --accent-hover: #e04a1d;
+            --bg-color: #fcfcfc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --focus-ring: 0 0 0 3px rgba(255, 91, 41, 0.4);
+            
+            --info-bg: #ebf8ff;
+            --info-border: #bee3f8;
+            --info-text: #2b6cb0;
+            
+            --warn-bg: #fff5f5;
+            --warn-border: #fed7d7;
+            --warn-text: #c53030;
+            
+            --success-bg: #f0fff4;
+            --success-border: #c6f6d5;
+            --success-text: #2f855a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--accent-color);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 900px) {
+            .layout {
+                grid-template-columns: 280px 1fr;
+            }
+            
+            .sidebar {
+                position: sticky;
+                top: 2rem;
+                height: fit-content;
+            }
+        }
+
+        /* Navigation */
+        .nav-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .nav-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-card ul {
+            list-style: none;
+        }
+
+        .nav-card li {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-card a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .nav-card a:hover, .nav-card a:focus {
+            color: var(--accent-color);
+            outline: none;
+        }
+
+        .nav-card a:focus-visible {
+            outline: 2px solid var(--accent-color);
+            border-radius: 4px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .content-section h2 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1.25rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f7fafc;
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Info Boxes */
+        .box {
+            padding: 1rem 1.25rem;
+            border-left: 4px solid;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+
+        .box-info {
+            background-color: var(--info-bg);
+            border-color: var(--info-border);
+            color: var(--info-text);
+        }
+
+        .box-warn {
+            background-color: var(--warn-bg);
+            border-color: var(--warn-border);
+            color: var(--warn-text);
+        }
+
+        .box-success {
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+
+        /* SVG & UI Replications */
+        .ui-replication {
+            background-color: #f7fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Animation Area */
+        .animation-container {
+            background-color: #f7fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .animation-controls {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background-color: #4a5568;
+        }
+
+        .status-bar {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            min-height: 1.5rem;
+        }
+
+        /* Accessibility */
+        a:focus, button:focus {
+            outline: 3px solid rgba(255, 91, 41, 0.4);
+            outline-offset: 2px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animated-element {
+                animation: none !important;
+                transition: none !important;
+            }
+            /* Show final state directly */
+            #anim-toggle { transform: translateX(24px) !important; fill: #48bb78 !important; }
+            #anim-url-text { opacity: 1 !important; }
+            #anim-id-text { opacity: 1 !important; }
+            #anim-save-btn { fill: #48bb78 !important; }
+            #anim-save-label { fill: #ffffff !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>OCPP-Wallbox einrichten</h1>
+        <p>Verbinden Sie Ihre Ladestation ganz einfach über das standardisierte OCPP-Protokoll mit thermondo smart.</p>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+            
+            <aside class="sidebar">
+                <nav class="nav-card" aria-label="Kapitelnavigation">
+                    <h3>Inhalt</h3>
+                    <ul>
+                        <li><a href="#ueberblick">1. Überblick</a></li>
+                        <li><a href="#voraussetzungen">2. Voraussetzungen</a></li>
+                        <li><a href="#einstellungen">3. Einstellungen am Gerät</a></li>
+                        <li><a href="#anlegen">4. thermondo smart App</a></li>
+                        <li><a href="#verbindung">5. Verbindung prüfen</a></li>
+                        <li><a href="#hilfe">6. Hilfe & FAQ</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <main>
+                <!-- 1. Überblick -->
+                <section id="ueberblick" class="content-section">
+                    <h2>1. Überblick</h2>
+                    
+                    <p>Das Open Charge Point Protocol (OCPP) ist ein universeller Kommunikationsstandard für Ladestationen. Durch die Aktivierung von OCPP kann Ihr intelligenter Energiemanager <strong>thermondo smart</strong> direkt mit Ihrer Wallbox kommunizieren. Dies ermöglicht es, Ladevorgänge intelligent zu steuern – beispielsweise, um Ihr Elektroauto bevorzugt mit kostenlosem Solarstrom aus Ihrer eigenen PV-Anlage zu laden oder günstige Stunden eines dynamischen Stromtarifs zu nutzen.</p>
+                </section>
+
+                <!-- 2. Voraussetzungen -->
+                <section id="voraussetzungen" class="content-section">
+                    <h2>2. Voraussetzungen</h2>
+                    
+                    <p>Bevor Sie mit der Einrichtung beginnen, stellen Sie bitte sicher, dass folgende Punkte erfüllt sind:</p>
+                    <ul>
+                        <li>Ihre Wallbox unterstützt das Protokoll <strong>OCPP 1.6J</strong> (oder höher).</li>
+                        <li>Die Wallbox ist erfolgreich per WLAN oder LAN mit Ihrem Heimnetzwerk und dem Internet verbunden.</li>
+                        <li>Die aktuellste Firmware-Version ist auf Ihrer Wallbox installiert.</li>
+                        <li>Sie haben die Zugangsdaten zur Konfigurations-App oder Web-Oberfläche des Herstellers Ihrer Wallbox bereitliegen.</li>
+                    </ul>
+                    <div class="box box-info">
+                        <strong>Hinweis:</strong> Stellen Sie sicher, dass der Name Ihrer Wallbox in den Einstellungen des Herstellers keine Leerzeichen oder Sonderzeichen enthält, da dies die Kommunikation beeinträchtigen kann.
+                    </div>
+                </section>
+
+                <!-- 3. Einstellungen am Gerät -->
+                <section id="einstellungen" class="content-section">
+                    <h2>3. Einstellungen am Gerät</h2>
+                    
+                    <p>Um die Wallbox für thermondo smart freizugeben, müssen Sie die OCPP-Funktion in der App oder der Weboberfläche Ihrer Wallbox aktivieren. Tragen Sie dort die Verbindungsdaten ein, die Sie von thermondo erhalten.</p>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Einstellungsfeld</th>
+                                    <th>Wert / Bedeutung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>OCPP aktivieren</strong></td>
+                                    <td>Schalter auf "AN" bzw. "Aktiviert" stellen.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Server-URL / CSMS-Endpunkt</strong></td>
+                                    <td>Die individuelle URL aus Ihrer thermondo smart App (z. B. beginnend mit <code>wss://...</code>).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ladepunkt-ID / Identity</strong></td>
+                                    <td>Die eindeutige Identifikationsnummer Ihrer Wallbox (wird in der App angezeigt).</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Passwort / Security Key</strong></td>
+                                    <td>(Optional) Falls von Ihrer Wallbox gefordert, das in der App angezeigte Passwort.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p>Hier sehen Sie ein Beispiel, wie die Konfigurationsoberfläche in Ihrer Wallbox-App typischerweise aussieht:</p>
+                    
+                    <div class="ui-replication">
+                        <svg width="320" height="240" viewBox="0 0 320 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Nachbildung der OCPP-Einstellungen in einer Wallbox-App" role="img">
+                            <rect width="320" height="240" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+                            <rect width="320" height="45" rx="12" fill="#f7fafc"/>
+                            <text x="160" y="28" fill="#2d3748" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">OCPP Einstellungen</text>
+                            
+                            <!-- Toggle -->
+                            <text x="20" y="80" fill="#2d3748" font-family="sans-serif" font-size="12" font-weight="bold">OCPP aktivieren</text>
+                            <rect x="240" y="66" width="50" height="22" rx="11" fill="#48bb78"/>
+                            <circle cx="279" cy="77" r="9" fill="#ffffff"/>
+
+                            <!-- URL Field -->
+                            <text x="20" y="120" fill="#718096" font-family="sans-serif" font-size="10">Server-URL (CSMS)</text>
+                            <rect x="20" y="128" width="280" height="30" rx="4" fill="#f7fafc" stroke="#cbd5e0"/>
+                            <text x="30" y="147" fill="#2d3748" font-family="sans-serif" font-size="11">wss://smart.thermondo.de/ocpp/12345</text>
+
+                            <!-- Identity Field -->
+                            <text x="20" y="180" fill="#718096" font-family="sans-serif" font-size="10">Ladepunkt-Identität (ID)</text>
+                            <rect x="20" y="188" width="280" height="30" rx="4" fill="#f7fafc" stroke="#cbd5e0"/>
+                            <text x="30" y="207" fill="#2d3748" font-family="sans-serif" font-size="11">DE-TMD-12345</text>
+                        </svg>
+                    </div>
+                </section>
+
+                <!-- 4. Anlegen in thermondo smart -->
+                <section id="anlegen" class="content-section">
+                    <h2>4. Anlegen in thermondo smart</h2>
+                    
+                    <p>Folgen Sie diesen Schritten in Ihrer thermondo smart App, um die Einrichtung abzuschließen:</p>
+                    <ol>
+                        <li>Öffnen Sie die <strong>thermondo smart App</strong> auf Ihrem Smartphone.</li>
+                        <li>Navigieren Sie im Menü zu <strong>Geräte hinzufügen</strong> und wählen Sie <strong>Wallbox</strong> aus.</li>
+                        <li>Wählen Sie als Verbindungstyp <strong>OCPP</strong>.</li>
+                        <li>Ihnen wird nun Ihre persönliche <strong>OCPP-URL</strong> sowie die <strong>Ladepunkt-ID</strong> angezeigt. Kopieren Sie diese Werte.</li>
+                        <li>Tragen Sie diese Daten wie in Kapitel 3 beschrieben in die App Ihrer Wallbox ein und speichern Sie dort.</li>
+                        <li>Kehren Sie zur thermondo smart App zurück und tippen Sie auf <strong>Speichern</strong>.</li>
+                    </ol>
+
+                    <!-- Interactive Animation -->
+                    <div class="animation-container">
+                        <h3>Interaktive Anleitung: OCPP-Einrichtung simulieren</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Tippen Sie auf "Start", um den Ablauf Schritt für Schritt anzusehen.</p>
+                        
+                        <div style="display: flex; justify-content: center; margin: 1.5rem 0;">
+                            <svg width="280" height="380" viewBox="0 0 280 380" fill="none" xmlns="http://www.w3.org/2000/svg" style="background: #1a202c; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+                                <!-- Phone Frame -->
+                                <rect x="5" y="5" width="270" height="370" rx="20" fill="#2d3748" stroke="#4a5568" stroke-width="4"/>
+                                <rect x="10" y="10" width="260" height="360" rx="16" fill="#ffffff"/>
+                                <!-- Notch -->
+                                <rect x="100" y="10" width="80" height="15" rx="7" fill="#2d3748"/>
+                                
+                                <!-- App Header -->
+                                <rect x="10" y="35" width="260" height="40" fill="#ff5b29"/>
+                                <text x="140" y="60" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Wallbox Setup (OCPP)</text>
+                                
+                                <!-- Toggle Section -->
+                                <text x="30" y="110" fill="#2d3748" font-family="sans-serif" font-size="11" font-weight="bold">OCPP aktivieren</text>
+                                <rect x="190" y="96" width="50" height="22" rx="11" fill="#cbd5e0" id="anim-toggle-bg"/>
+                                <circle cx="201" cy="107" r="9" fill="#ffffff" id="anim-toggle" class="animated-element" style="transition: transform 0.4s, fill 0.4s;"/>
+
+                                <!-- Input URL -->
+                                <text x="30" y="150" fill="#718096" font-family="sans-serif" font-size="9">Server-URL</text>
+                                <rect x="30" y="158" width="220" height="30" rx="4" fill="#f7fafc" stroke="#cbd5e0"/>
+                                <text x="38" y="177" fill="#a0aec0" font-family="sans-serif" font-size="10" id="anim-url-placeholder">Eingeben...</text>
+                                <text x="38" y="177" fill="#2d3748" font-family="sans-serif" font-size="9" id="anim-url-text" style="opacity: 0; transition: opacity 0.3s;">wss://smart.thermondo.de/ocpp/12345</text>
+
+                                <!-- Input ID -->
+                                <text x="30" y="210" fill="#718096" font-family="sans-serif" font-size="9">Ladepunkt-ID</text>
+                                <rect x="30" y="218" width="220" height="30" rx="4" fill="#f7fafc" stroke="#cbd5e0"/>
+                                <text x="38" y="237" fill="#a0aec0" font-family="sans-serif" font-size="10" id="anim-id-placeholder">Eingeben...</text>
+                                <text x="38" y="237" fill="#2d3748" font-family="sans-serif" font-size="10" id="anim-id-text" style="opacity: 0; transition: opacity 0.3s;">DE-TMD-12345</text>
+
+                                <!-- Save Button -->
+                                <rect x="30" y="280" width="220" height="35" rx="6" fill="#ff5b29" id="anim-save-btn" style="transition: fill 0.3s;"/>
+                                <text x="140" y="302" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" id="anim-save-label">Speichern</text>
+                            </svg>
+                        </div>
+
+                        <div class="status-bar" id="animation-status">Bereit zum Starten</div>
+                        
+                        <div class="animation-controls">
+                            <button class="btn" id="btn-play" onclick="startAnimation()">Start</button>
+                            <button class="btn btn-secondary" onclick="resetAnimation()">Zurücksetzen</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Verbindung prüfen -->
+                <section id="verbindung" class="content-section">
+                    <h2>5. Verbindung prüfen</h2>
+                    
+                    <p>Nachdem Sie die Einstellungen auf beiden Seiten gespeichert haben, überprüfen Sie die erfolgreiche Verbindung:</p>
+                    <ul>
+                        <li>Es kann bis zu <strong>10 Minuten</strong> dauern, bis sich die Wallbox zum ersten Mal am Server anmeldet.</li>
+                        <li>Sobald die Verbindung steht, ändert sich der Status in Ihrer thermondo smart App auf "Verbunden".</li>
+                    </ul>
+                    <div class="box box-success">
+                        <strong>Wichtiger Tipp:</strong> Um den ersten Statusbericht von der Wallbox zu erzwingen und die Verbindung sofort zu testen, starten Sie einen kurzen Ladevorgang an Ihrem Elektrofahrzeug.
+                    </div>
+                </section>
+
+                <!-- 6. Hilfe & FAQ -->
+                <section id="hilfe" class="content-section">
+                    <h2>6. Hilfe & FAQ</h2>
+                    
+                    
+                    <h3>Häufige Probleme und Lösungen</h3>
+                    <br>
+                    
+                    <p><strong>Frage: Meine Wallbox verbindet sich nicht (bleibt offline). Was kann ich tun?</strong></p>
+                    <p><em>Antwort:</em> Prüfen Sie, ob die Server-URL exakt eingegeben wurde (achten Sie besonders auf Tippfehler bei <code>wss://</code>). Stellen Sie außerdem sicher, dass Ihre Wallbox eine stabile Internetverbindung hat. Oft hilft es, den Router oder die Wallbox einmal kurz neu zu starten.</p>
+                    
+                    <p><strong>Frage: Warum wird mir in der thermondo smart App kein Ladestatus angezeigt?</strong></p>
+                    <p><em>Antwort:</em> Viele Wallboxen senden erst dann Daten, wenn tatsächlich ein Auto angeschlossen ist und der Ladevorgang gestartet wurde. Schließen Sie Ihr Auto an, um die Datenübertragung zu aktivieren.</p>
+
+                    <div class="box box-warn">
+                        <strong>Achtung:</strong> Nutzen Sie keine parallelen Lade-Optimierungen in der App des Wallbox-Herstellers (wie z. B. zeitgesteuertes Laden), da sich diese mit der intelligenten Steuerung von thermondo smart überschneiden und zu Fehlern führen können.
+                    </div>
+                </section>
+            </main>
+
+        </div>
+    </div>
+
+    <script>
+        let animationTimeout;
+
+        function startAnimation() {
+            resetAnimation();
+            const toggle = document.getElementById('anim-toggle');
+            const toggleBg = document.getElementById('anim-toggle-bg');
+            const urlPlaceholder = document.getElementById('anim-url-placeholder');
+            const urlText = document.getElementById('anim-url-text');
+            const idPlaceholder = document.getElementById('anim-id-placeholder');
+            const idText = document.getElementById('anim-id-text');
+            const saveBtn = document.getElementById('anim-save-btn');
+            const saveLabel = document.getElementById('anim-save-label');
+            const status = document.getElementById('animation-status');
+            const playBtn = document.getElementById('btn-play');
+
+            playBtn.disabled = true;
+
+            // Step 1: Enable OCPP
+            status.innerText = "Schritt 1: OCPP aktivieren...";
+            animationTimeout = setTimeout(() => {
+                toggle.style.transform = 'translateX(24px)';
+                toggleBg.setAttribute('fill', '#48bb78');
+                
+                // Step 2: Enter URL
+                animationTimeout = setTimeout(() => {
+                    status.innerText = "Schritt 2: Server-URL eintragen...";
+                    urlPlaceholder.style.opacity = '0';
+                    urlText.style.opacity = '1';
+
+                    // Step 3: Enter ID
+                    animationTimeout = setTimeout(() => {
+                        status.innerText = "Schritt 3: Ladepunkt-ID eintragen...";
+                        idPlaceholder.style.opacity = '0';
+                        idText.style.opacity = '1';
+
+                        // Step 4: Save
+                        animationTimeout = setTimeout(() => {
+                            status.innerText = "Schritt 4: Einstellungen speichern...";
+                            saveBtn.setAttribute('fill', '#48bb78');
+                            saveLabel.textContent = "Gespeichert!";
+                            
+                            animationTimeout = setTimeout(() => {
+                                status.innerText = "Erfolgreich verbunden!";
+                                playBtn.disabled = false;
+                            }, 1000);
+                        }, 1200);
+                    }, 1200);
+                }, 1200);
+            }, 1000);
+        }
+
+        function resetAnimation() {
+            clearTimeout(animationTimeout);
+            const toggle = document.getElementById('anim-toggle');
+            const toggleBg = document.getElementById('anim-toggle-bg');
+            const urlPlaceholder = document.getElementById('anim-url-placeholder');
+            const urlText = document.getElementById('anim-url-text');
+            const idPlaceholder = document.getElementById('anim-id-placeholder');
+            const idText = document.getElementById('anim-id-text');
+            const saveBtn = document.getElementById('anim-save-btn');
+            const saveLabel = document.getElementById('anim-save-label');
+            const status = document.getElementById('animation-status');
+            const playBtn = document.getElementById('btn-play');
+
+            toggle.style.transform = 'translateX(0px)';
+            toggleBg.setAttribute('fill', '#cbd5e0');
+            urlPlaceholder.style.opacity = '1';
+            urlText.style.opacity = '0';
+            idPlaceholder.style.opacity = '1';
+            idText.style.opacity = '0';
+            saveBtn.setAttribute('fill', '#ff5b29');
+            saveLabel.textContent = "Speichern";
+            status.innerText = "Bereit zum Starten";
+            playBtn.disabled = false;
+        }
+    </script>
+</body>
+</html>
