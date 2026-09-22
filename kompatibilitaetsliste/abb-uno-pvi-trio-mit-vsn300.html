@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABB EQmatic mit thermondo smart verbinden</title>
+  <style>
+    :root {
+      --accent-color: #ff5b29;
+      --accent-hover: #e04a1d;
+      --bg-color: #fcfcfc;
+      --card-bg: #ffffff;
+      --text-color: #2d3748;
+      --text-muted: #718096;
+      --border-color: #e2e8f0;
+      --success-color: #abf5d1;
+      --success-text: #0f5132;
+      --info-bg: #e0f2fe;
+      --info-text: #0369a1;
+      --warning-bg: #fee2e2;
+      --warning-text: #991b1b;
+      --focus-ring: 0 0 0 3px rgba(255, 91, 41, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: #1a202c;
+      margin-bottom: 0.5rem;
+      font-weight: 800;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 900px) {
+      .container {
+        grid-template-columns: 280px 1fr;
+      }
+      
+      .sidebar {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+      }
+    }
+
+    /* Navigation */
+    .nav-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .nav-card ul {
+      list-style: none;
+    }
+
+    .nav-card li {
+      margin-bottom: 0.75rem;
+    }
+
+    .nav-card a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      display: block;
+      padding: 0.25rem 0;
+    }
+
+    .nav-card a:hover, .nav-card a:focus {
+      color: var(--accent-color);
+      outline: none;
+    }
+
+    .nav-card a:focus-visible {
+      outline: 2px solid var(--accent-color);
+      border-radius: 4px;
+    }
+
+    /* Main Content */
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      scroll-margin-top: 2rem;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      color: #1a202c;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent-color);
+      padding-left: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    /* Lists */
+    ol, ul {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.75rem;
+    }
+
+    /* Alert Boxes */
+    .alert {
+      padding: 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .alert-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .alert-warning {
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+      border: 1px solid #fca5a5;
+    }
+
+    .alert-info {
+      background-color: var(--info-bg);
+      color: var(--info-text);
+      border: 1px solid #bae6fd;
+    }
+
+    .alert-success {
+      background-color: var(--success-color);
+      color: var(--success-text);
+      border: 1px solid #6ee7b7;
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #1a202c;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* SVG UI Mockup */
+    .ui-mockup {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      max-width: 100%;
+    }
+
+    /* Animation Area */
+    .animation-box {
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: monospace;
+      position: relative;
+    }
+
+    .animation-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background-color: #475569;
+    }
+
+    .btn-secondary:hover {
+      background-color: #334155;
+    }
+
+    .status-bar {
+      background: #0f172a;
+      padding: 0.75rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      section {
+        padding: 1.25rem;
+      }
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <h1>ABB EQmatic Zähler verbinden</h1>
+      <p>Erfahren Sie, wie Sie Ihren ABB EQmatic Zähler schnell und sicher in thermondo smart einrichten.</p>
+      <p style="font-size: 0.9rem; margin-top: 0.5rem;"><strong>Stand:</strong> Q3/2025</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <nav class="nav-card" aria-label="Kapitelnavigation">
+        <h3>Inhalt</h3>
+        <ul>
+          <li><a href="#ueberblick">1. Überblick</a></li>
+          <li><a href="#voraussetzungen">2. Voraussetzungen</a></li>
+          <li><a href="#einstellungen">3. Einstellungen am Gerät</a></li>
+          <li><a href="#anlegen">4. Anlegen in thermondo smart</a></li>
+          <li><a href="#verbindung">5. Verbindung prüfen</a></li>
+          <li><a href="#hilfe">6. Hilfe &amp; Fehlerbehebung</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main>
+      <!-- 1. Ueberblick -->
+      <section id="ueberblick">
+        <h2>1. Überblick</h2>
+        <p>Diese Anleitung beschreibt die Integration der folgenden Geräte in das System <strong>thermondo smart</strong>:</p>
+        <ul>
+          <li>ABB EQmatic als Energiemessung</li>
+          <li>ABB EQmatic als Produktionsmessung</li>
+          <li>ABB EQmatic als Smart Meter</li>
+        </ul>
+        
+        <div class="alert alert-warning" role="alert">
+          <span class="alert-icon">⚠️</span>
+          <div>
+            <strong>Wichtiger Hinweis:</strong> Dieser Zähler kann nicht für die ZEV-Funktion (Zusammenschluss zum Eigenverbrauch) genutzt werden.
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Voraussetzungen -->
+      <section id="voraussetzungen">
+        <h2>2. Voraussetzungen</h2>
+        <div class="alert alert-success" role="alert">
+          <span class="alert-icon">💡</span>
+          <div>
+            Die Integration dieses Zählers kann erweiterte Netzwerkkenntnisse benötigen. Es wird Laien nicht empfohlen, dies selbst durchzuführen.
+          </div>
+        </div>
+        <p>Stellen Sie sicher, dass folgende Voraussetzungen erfüllt sind, bevor Sie mit der Einrichtung beginnen:</p>
+        <ul>
+          <li>Der ABB EQmatic Zähler ist im selben Netzwerk wie Ihr thermondo smart Gateway installiert.</li>
+          <li>Sie haben Zugriff auf die Weboberfläche des EQmatic Zählers über einen Webbrowser.</li>
+        </ul>
+      </section>
+
+      <!-- 3. Einstellungen am Geraet -->
+      <section id="einstellungen">
+        <h2>3. Einstellungen am EQmatic Zähler</h2>
+        
+        
+        <p>Über die Weboberfläche des Zählers müssen Sie die folgenden Werte aktivieren oder kopieren:</p>
+        
+        <ol>
+          <li>
+            <strong>Autorisierungstoken:</strong> Navigieren Sie zu Ihrem <strong>Benutzerprofil</strong> und öffnen Sie die Registerkarte <strong>"Autorisierungstoken"</strong>. Aktivieren Sie dort die <strong>EQmatic API-Token-Authentifizierung</strong> und kopieren Sie den Token.
+          </li>
+          <li>
+            <strong>Seriennummer:</strong> Kopieren Sie auch die <strong>Seriennummer</strong> des Zählers.
+          </li>
+          <li>
+            <strong>SSL-Zertifikat:</strong> Das <strong>SSL-Zertifikat</strong> muss für das gesamte Subnetz aktiviert werden.
+          </li>
+          <li>
+            <strong>Software:</strong> Stellen Sie sicher, dass der Zähler auf dem <strong>aktuellsten Softwarestand</strong> ist.
+          </li>
+        </ol>
+
+        <h3 style="margin: 1.5rem 0 1rem 0; font-size: 1.2rem;">Interaktive Anleitung: Token aktivieren</h3>
+        <p class="reduced-motion-text" style="display: none; font-style: italic; color: var(--text-muted);">
+          Hinweis: Die Animation wird aufgrund Ihrer Systemeinstellungen nicht abgespielt. Der Endzustand ist unten dargestellt.
+        </p>
+
+        <div class="animation-box">
+          <div class="animation-controls">
+            <button class="btn" id="start-anim">Ablauf starten</button>
+            <button class="btn btn-secondary" id="reset-anim">Zurücksetzen</button>
+          </div>
+
+          <div class="ui-mockup">
+            <svg viewBox="0 0 600 300" width="100%" height="auto" style="background: #ffffff; border-radius: 4px; border: 1px solid #cbd5e1;">
+              <!-- Header -->
+              <rect x="0" y="0" width="600" height="40" fill="#1e293b"/>
+              <text x="15" y="25" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="bold">ABB EQmatic WebUI</text>
+              
+              <!-- Sidebar -->
+              <rect x="0" y="40" width="150" height="260" fill="#f1f5f9"/>
+              <rect id="nav-profile" x="10" y="50" width="130" height="30" rx="4" fill="#e2e8f0"/>
+              <text x="20" y="70" fill="#334155" font-family="sans-serif" font-size="12" font-weight="bold">Benutzerprofil</text>
+              <text x="20" y="110" fill="#64748b" font-family="sans-serif" font-size="12">System</text>
+              <text x="20" y="140" fill="#64748b" font-family="sans-serif" font-size="12">Messwerte</text>
+              
+              <!-- Main Area -->
+              <text x="170" y="70" fill="#1e293b" font-family="sans-serif" font-size="16" font-weight="bold">Benutzereinstellungen</text>
+              
+              <!-- Tabs -->
+              <rect id="tab-token" x="170" y="90" width="140" height="25" rx="4" fill="#cbd5e1"/>
+              <text x="180" y="107" fill="#334155" font-family="sans-serif" font-size="11" font-weight="bold">Autorisierungstoken</text>
+              
+              <!-- Content Box -->
+              <rect x="170" y="125" width="410" height="150" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+              
+              <!-- Toggle Switch -->
+              <text x="190" y="160" fill="#334155" font-family="sans-serif" font-size="12">EQmatic API-Token-Authentifizierung</text>
+              <rect id="toggle-bg" x="480" y="147" width="50" height="20" rx="10" fill="#cbd5e1"/>
+              <circle id="toggle-knob" cx="490" cy="157" r="8" fill="#ffffff"/>
+              
+              <!-- Token Field -->
+              <text x="190" y="200" fill="#334155" font-family="sans-serif" font-size="12">Aktueller Token:</text>
+              <rect x="190" y="210" width="370" height="30" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+              <text id="token-text" x="200" y="230" fill="#94a3b8" font-family="monospace" font-size="11">Kein Token aktiv</text>
+              
+              <!-- Cursor -->
+              <circle id="cursor" cx="75" cy="65" r="6" fill="#ff5b29" opacity="0"/>
+            </svg>
+          </div>
+
+          <div class="status-bar" id="anim-status">
+            Bereit. Klicken Sie auf "Ablauf starten", um die Schritte zu sehen.
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Anlegen in thermondo smart -->
+      <section id="anlegen">
+        <h2>4. Integration in thermondo smart</h2>
+        <ol>
+          <li>
+            Wählen Sie in thermondo smart die Kategorie, in der der Zähler erfasst werden soll: 
+            <strong>"Geräte" -&gt; "Energiemessung", "Wechselrichter"</strong> oder <strong>"Smart Meter"</strong>.
+          </li>
+          <li>
+            Um den Zähler zu verbinden, geben Sie neben der <strong>IP-Adresse</strong> des Geräts auch die zuvor kopierten Werte ein.
+          </li>
+        </ol>
+
+        <div class="alert alert-info" role="alert">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            <strong>Hinweis:</strong> Bei diesem Gerät kann die Registernummer, die abgefragt werden soll, je nach Installation konfiguriert werden. Tragen Sie hier die konfigurierte Registernummer für die verbrauchte Leistung ein.
+          </div>
+        </div>
+
+        <h3 style="margin-top: 1.5rem; font-size: 1.2rem; margin-bottom: 1rem;">Eintragungsfelder in thermondo smart</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Eingabefeld</th>
+                <th>Bedeutung / Herkunft</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>IP-Adresse</strong></td>
+                <td>Die lokale Netzwerk-IP-Adresse Ihres ABB EQmatic Zählers.</td>
+              </tr>
+              <tr>
+                <td><strong>Autorisierungstoken</strong></td>
+                <td>Der aus dem Benutzerprofil des EQmatic kopierte API-Token.</td>
+              </tr>
+              <tr>
+                <td><strong>Seriennummer</strong></td>
+                <td>Die eindeutige Seriennummer Ihres EQmatic Zählers.</td>
+              </tr>
+              <tr>
+                <td><strong>Registernummer</strong></td>
+                <td>Die in Ihrer Installation konfigurierte Registernummer für die verbrauchte Leistung.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5. Verbindung pruefen -->
+      <section id="verbindung">
+        <h2>5. Verbindung prüfen</h2>
+        <p>Sobald Sie alle Daten in thermondo smart eingetragen und gespeichert haben, prüft das System die Verbindung:</p>
+        <ul>
+          <li>Achten Sie auf das Statussymbol in der thermondo smart Übersicht.</li>
+          <li>Ein grünes Symbol signalisiert eine erfolgreiche Datenübertragung.</li>
+          <li>Werden keine Werte angezeigt, prüfen Sie die Netzwerkeinstellungen und ob das SSL-Zertifikat korrekt für das Subnetz freigegeben ist.</li>
+        </ul>
+      </section>
+
+      <!-- 6. Hilfe -->
+      <section id="hilfe">
+        <h2>6. Hilfe &amp; Fehlerbehebung</h2>
+        
+        <h3 style="font-size: 1.2rem; margin-top: 1rem; margin-bottom: 0.5rem;">Häufige Probleme und Lösungen</h3>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <p><strong>Problem: Der Token lässt sich nicht aktivieren.</strong></p>
+          <p style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1rem; border-left: 2px solid var(--border-color);">
+            Lösung: Stellen Sie sicher, dass Sie mit einem Administrator-Konto auf der Weboberfläche des EQmatic angemeldet sind. Einfache Benutzerkonten haben eventuell nicht die Berechtigung, API-Token zu generieren.
+          </p>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <p><strong>Problem: Keine Verbindung trotz korrektem Token.</strong></p>
+          <p style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1rem; border-left: 2px solid var(--border-color);">
+            Lösung: Prüfen Sie, ob das SSL-Zertifikat für das gesamte Subnetz freigegeben ist. Wenn das Gateway von thermondo smart in einem anderen Subnetz liegt, kann die SSL-Verschlüsselung die Verbindung blockieren.
+          </p>
+        </div>
+
+        <div>
+          <p><strong>Problem: Falsche Messwerte werden übertragen.</strong></p>
+          <p style="color: var(--text-muted); font-size: 0.95rem; padding-left: 1rem; border-left: 2px solid var(--border-color);">
+            Lösung: Überprüfen Sie die eingetragene Registernummer. Da diese je nach Installation variieren kann, muss sie exakt mit der im EQmatic für die verbrauchte Leistung konfigurierten Nummer übereinstimmen.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Animation Logic
+    const startBtn = document.getElementById('start-anim');
+    const resetBtn = document.getElementById('reset-anim');
+    const cursor = document.getElementById('cursor');
+    const navProfile = document.getElementById('nav-profile');
+    const tabToken = document.getElementById('tab-token');
+    const toggleBg = document.getElementById('toggle-bg');
+    const toggleKnob = document.getElementById('toggle-knob');
+    const tokenText = document.getElementById('token-text');
+    const statusText = document.getElementById('anim-status');
+
+    let animTimeout;
+
+    // Check for reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      document.querySelector('.reduced-motion-text').style.display = 'block';
+      setEndState();
+    }
+
+    function setEndState() {
+      toggleBg.setAttribute('fill', '#ff5b29');
+      toggleKnob.setAttribute('cx', '520');
+      tokenText.textContent = 'eq_api_67f8a901bc34de...';
+      tokenText.setAttribute('fill', '#1e293b');
+      statusText.textContent = 'Endzustand: API-Token ist erfolgreich aktiviert und kopiert.';
+    }
+
+    function resetState() {
+      clearTimeout(animTimeout);
+      cursor.setAttribute('opacity', '0');
+      cursor.setAttribute('cx', '75');
+      cursor.setAttribute('cy', '65');
+      toggleBg.setAttribute('fill', '#cbd5e1');
+      toggleKnob.setAttribute('cx', '490');
+      tokenText.textContent = 'Kein Token aktiv';
+      tokenText.setAttribute('fill', '#94a3b8');
+      statusText.textContent = 'Bereit. Klicken Sie auf "Ablauf starten", um die Schritte zu sehen.';
+    }
+
+    function runAnimation() {
+      if (prefersReducedMotion) return;
+      resetState();
+
+      // Step 1: Move to Benutzerprofil
+      statusText.textContent = 'Schritt 1: Navigiere zum Benutzerprofil...';
+      cursor.setAttribute('opacity', '1');
+      
+      animTimeout = setTimeout(() => {
+        cursor.setAttribute('cx', '75');
+        cursor.setAttribute('cy', '65');
+        
+        // Step 2: Click Autorisierungstoken Tab
+        animTimeout = setTimeout(() => {
+          statusText.textContent = 'Schritt 2: Öffne Registerkarte "Autorisierungstoken"...';
+          cursor.setAttribute('cx', '240');
+          cursor.setAttribute('cy', '102');
+          
+          animTimeout = setTimeout(() => {
+            // Step 3: Toggle API-Token
+            statusText.textContent = 'Schritt 3: EQmatic API-Token-Authentifizierung aktivieren...';
+            cursor.setAttribute('cx', '505');
+            cursor.setAttribute('cy', '157');
+            
+            animTimeout = setTimeout(() => {
+              toggleBg.setAttribute('fill', '#ff5b29');
+              toggleKnob.setAttribute('cx', '520');
+              tokenText.textContent = 'eq_api_67f8a901bc34de...';
+              tokenText.setAttribute('fill', '#1e293b');
+              
+              // Step 4: Copy Token
+              animTimeout = setTimeout(() => {
+                statusText.textContent = 'Schritt 4: Token erfolgreich generiert und kopiert!';
+                cursor.setAttribute('cx', '375');
+                cursor.setAttribute('cy', '225');
+                
+                animTimeout = setTimeout(() => {
+                  cursor.setAttribute('opacity', '0');
+                }, 1000);
+              }, 1200);
+            }, 1200);
+          }, 1200);
+        }, 1200);
+      }, 500);
+    }
+
+    startBtn.addEventListener('click', runAnimation);
+    resetBtn.addEventListener('click', resetState);
+  </script>
+</body>
+</html>
