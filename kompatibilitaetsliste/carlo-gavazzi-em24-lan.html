@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carlo Gavazzi EM Integration - thermondo smart</title>
+    <style>
+        :root {
+            --primary: #ff5b29;
+            --primary-hover: #e04a1b;
+            --bg: #fcfcfc;
+            --card-bg: #ffffff;
+            --text: #2c2c2c;
+            --text-light: #606060;
+            --border: #e0e0e0;
+            --success: #2e7d32;
+            --success-bg: #e8f5e9;
+            --info: #1565c0;
+            --info-bg: #e3f2fd;
+            --warning: #c62828;
+            --warning-bg: #ffebee;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Layout Grid */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 900px) {
+            .layout {
+                grid-template-columns: 280px 1fr;
+            }
+            
+            .sidebar {
+                position: sticky;
+                top: 2rem;
+                height: fit-content;
+            }
+        }
+
+        /* Navigation */
+        .nav-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .nav-card h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-list li {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-list a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-list a:hover {
+            background: #f5f5f5;
+            color: var(--primary);
+        }
+
+        .nav-list a:focus {
+            outline: 2px solid var(--primary);
+            background: #f5f5f5;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .content-section h2 {
+            font-size: 1.5rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Info Boxes */
+        .box {
+            padding: 1rem 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .box-info {
+            background-color: var(--info-bg);
+            border-left-color: var(--info);
+            color: #0d47a1;
+        }
+
+        .box-warning {
+            background-color: var(--warning-bg);
+            border-left-color: var(--warning);
+            color: #b71c1c;
+        }
+
+        .box-success {
+            background-color: var(--success-bg);
+            border-left-color: var(--success);
+            color: #1b5e20;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        /* SVG & Interface Simulation */
+        .svg-container {
+            background: #f9f9f9;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Animation Area */
+        .animation-box {
+            background: #202020;
+            color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: monospace;
+            position: relative;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #555;
+        }
+
+        .btn-secondary:hover {
+            background-color: #666;
+        }
+
+        .status-line {
+            border-top: 1px solid #444;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            color: #00ff00;
+        }
+
+        /* Responsive utilities */
+        @media (max-width: 600px) {
+            .content-section {
+                padding: 1.25rem;
+            }
+            
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            tr {
+                border: 1px solid var(--border);
+                margin-bottom: 1rem;
+                border-radius: 4px;
+            }
+            
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+            }
+            
+            td:before {
+                position: absolute;
+                top: 50%;
+                left: 10px;
+                transform: translateY(-50%);
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                content: attr(data-label);
+            }
+        }
+    </style>
+</head>
+<body><div style="position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid #E4E7E3;padding:12px 20px;font-family:system-ui,-apple-system,sans-serif;display:flex;gap:12px;align-items:center"><a href="../" style="display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:#131A1F;font-size:14.5px;padding:6px 13px;border:1px solid #C9D0C9;border-radius:99px"><span style="font-size:17px;line-height:1">&larr;</span> Alle Geräte</a><span style="color:#71808A;font-size:14px">Carlo - Gavazzi EM24 (LAN)</span></div>
+
+    <header>
+        <h1>Carlo Gavazzi EM Integration</h1>
+        <p>Erfahren Sie, wie Sie Ihre Carlo Gavazzi EM24 oder EM3xx Energiemessgeräte schnell und unkompliziert mit thermondo smart verbinden.</p>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+            
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <nav class="nav-card" aria-label="Kapitelnavigation">
+                    <h3>Kapitel</h3>
+                    <ul class="nav-list">
+                        <li><a href="#ueberblick">1. Überblick</a></li>
+                        <li><a href="#voraussetzungen">2. Voraussetzungen</a></li>
+                        <li><a href="#einstellungen">3. Einstellungen am Gerät</a></li>
+                        <li><a href="#anlegen">4. Anlegen in thermondo smart</a></li>
+                        <li><a href="#verbindung">5. Verbindung prüfen</a></li>
+                        <li><a href="#hilfe">6. Hilfe &amp; Fehlerbehebung</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                
+                <!-- 1. Überblick -->
+                <section id="ueberblick" class="content-section">
+                    <h2>1. Überblick</h2>
+                    
+                    <p>Diese Anleitung beschreibt die Integration der folgenden Carlo Gavazzi Energiemessgeräte in Ihr thermondo smart System:</p>
+                    <ul>
+                        <li><strong>Carlo Gavazzi EM24</strong> (Drei-Phasen-Energiemessgerät)</li>
+                        <li><strong>Carlo Gavazzi EM3xx</strong> (z.B. EM330 Drei-Phasen-Messgerät für Wandleranschluss)</li>
+                    </ul>
+                    <p>Die Einbindung ermöglicht es thermondo smart, Ihre Stromflüsse am Netzanschlusspunkt in Echtzeit zu erfassen und zu optimieren.</p>
+                </section>
+
+                <!-- 2. Voraussetzungen -->
+                <section id="voraussetzungen" class="content-section">
+                    <h2>2. Voraussetzungen</h2>
+                    
+                    <p>Je nach Ihrem genauen Gerätemodell unterscheidet sich der physikalische Anschlussweg:</p>
+                    <ul>
+                        <li><strong>Carlo Gavazzi EM24:</strong> Die Verbindung erfolgt direkt über Ihr lokales Netzwerk mittels <strong>Modbus-TCP</strong> (Ethernet-Kabel).</li>
+                        <li><strong>Carlo Gavazzi EM3xx:</strong> Die Verbindung erfolgt über ein zweiadriges, abgeschirmtes Kabel mittels <strong>RS485-Bus</strong> (Modbus RTU).</li>
+                    </ul>
+
+                    <div class="box box-warning">
+                        <strong>Wichtig für EM3xx:</strong> Der letzte Teilnehmer am RS485-Bus muss immer mit einem <strong>120-Ohm-Widerstand</strong> abgeschlossen werden, um Signalreflexionen und Kommunikationsfehler zu vermeiden.
+                    </div>
+                </section>
+
+                <!-- 3. Einstellungen am Gerät -->
+                <section id="einstellungen" class="content-section">
+                    <h2>3. Einstellungen am Gerät</h2>
+                    
+                    
+                    <h3>Carlo Gavazzi EM24</h3>
+                    <div class="box box-info">
+                        Die Verbindung zum EM24 erfolgt über <strong>Modbus-TCP</strong>. Für die Einbindung sind keine speziellen Einstellungen am Gerät erforderlich. Stellen Sie lediglich sicher, dass das Gerät per Netzwerkkabel mit Ihrem Router verbunden ist.
+                    </div>
+
+                    <h3>Carlo Gavazzi EM3xx (RS485-Bus)</h3>
+                    <p>Für die Integration des EM3xx-Modells müssen Sie den RS485-Bus richtig konfigurieren und verkabeln. Nutzen Sie hierzu die folgende schematische Darstellung der Klemmenbelegung:</p>
+
+                    <!-- Inline SVG: RS485 Wiring Diagram -->
+                    <div class="svg-container">
+                        <svg width="500" height="220" viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Background -->
+                            <rect width="500" height="220" fill="#fcfcfc" rx="8" />
+                            
+                            <!-- Gateway/Controller Box -->
+                            <rect x="30" y="40" width="120" height="120" fill="#e0e0e0" stroke="#999" stroke-width="2" rx="4" />
+                            <text x="90" y="75" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Gateway /</text>
+                            <text x="90" y="95" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Controller</text>
+                            
+                            <!-- EM3xx Box -->
+                            <rect x="330" y="40" width="140" height="120" fill="#e0e0e0" stroke="#999" stroke-width="2" rx="4" />
+                            <text x="400" y="75" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">Carlo Gavazzi</text>
+                            <text x="400" y="95" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#333">EM3xx</text>
+
+                            <!-- Terminals Gateway -->
+                            <rect x="130" y="115" width="20" height="15" fill="#ff5b29" rx="2" />
+                            <text x="140" y="127" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">A</text>
+                            
+                            <rect x="130" y="135" width="20" height="15" fill="#ff5b29" rx="2" />
+                            <text x="140" y="147" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">B</text>
+
+                            <!-- Terminals EM3xx -->
+                            <rect x="330" y="115" width="20" height="15" fill="#ff5b29" rx="2" />
+                            <text x="340" y="127" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">A-</text>
+                            
+                            <rect x="330" y="135" width="20" height="15" fill="#ff5b29" rx="2" />
+                            <text x="340" y="147" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">B+</text>
+
+                            <!-- Bus lines -->
+                            <path d="M 150 122.5 L 330 122.5" stroke="#1565c0" stroke-width="3" fill="none" />
+                            <path d="M 150 142.5 L 330 142.5" stroke="#c62828" stroke-width="3" fill="none" />
+
+                            <!-- 120 Ohm Resistor at EM3xx -->
+                            <rect x="375" y="125" width="10" height="25" fill="#4caf50" stroke="#2e7d32" stroke-width="1" />
+                            <path d="M 340 122.5 L 380 122.5 L 380 125" stroke="#1565c0" stroke-width="2" fill="none" />
+                            <path d="M 340 142.5 L 380 142.5 L 380 150" stroke="#c62828" stroke-width="2" fill="none" />
+                            <text x="415" y="138" font-family="sans-serif" font-size="9" fill="#2e7d32" font-weight="bold">120 Ω</text>
+                        </svg>
+                    </div>
+
+                    <!-- Interactive Animation Sequence -->
+                    <h3>Interaktive Verkabelungs-Simulation</h3>
+                    <p>Klicken Sie auf "Starten", um den korrekten Ablauf der RS485-Verkabelung Schritt für Schritt zu sehen:</p>
+                    
+                    <div class="animation-box">
+                        <div class="animation-controls">
+                            <button class="btn" id="anim-start">Starten</button>
+                            <button class="btn btn-secondary" id="anim-reset">Zurücksetzen</button>
+                        </div>
+                        <div id="anim-canvas" style="height: 100px; display: flex; align-items: center; justify-content: center; border: 1px dashed #555; border-radius: 4px; margin-bottom: 0.5rem; background: #151515;">
+                            <span id="anim-visual" style="font-size: 1.2rem; color: #aaa;">Bereit zum Starten...</span>
+                        </div>
+                        <div class="status-line" id="anim-status">Status: Warte auf Start...</div>
+                    </div>
+                </section>
+
+                <!-- 4. Anlegen in thermondo smart -->
+                <section id="anlegen" class="content-section">
+                    <h2>4. Anlegen in thermondo smart</h2>
+                    <p>Tragen Sie die Gerätedaten in Ihrem thermondo smart Portal ein. Nutzen Sie hierzu die folgenden Werte:</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Einstellungsfeld</th>
+                                <th>Bedeutung / Wert</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Einstellungsfeld"><strong>Gerätetyp</strong></td>
+                                <td data-label="Bedeutung / Wert">Energiemessgerät (Smart Meter)</td>
+                            </tr>
+                            <tr>
+                                <td data-label="Einstellungsfeld"><strong>Hersteller / Modell</strong></td>
+                                <td data-label="Bedeutung / Wert">Carlo Gavazzi EM24 / EM3xx</td>
+                            </tr>
+                            <tr>
+                                <td data-label="Einstellungsfeld"><strong>Schnittstelle (EM24)</strong></td>
+                                <td data-label="Bedeutung / Wert">Modbus-TCP (Netzwerk/IP)</td>
+                            </tr>
+                            <tr>
+                                <td data-label="Einstellungsfeld"><strong>Schnittstelle (EM3xx)</strong></td>
+                                <td data-label="Bedeutung / Wert">Modbus-RTU (RS485 über Gateway)</td>
+                            </tr>
+                            <tr>
+                                <td data-label="Einstellungsfeld"><strong>Modbus-ID (Standard)</strong></td>
+                                <td data-label="Bedeutung / Wert">1 (oder wie am Gerät konfiguriert)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-success">
+                        <strong>Empfehlung:</strong> Vergeben Sie Ihrem Carlo Gavazzi EM im Router eine feste IP-Adresse (statische IP), damit die Verbindung auch nach einem Router-Neustart stabil bleibt.
+                    </div>
+                </section>
+
+                <!-- 5. Verbindung prüfen -->
+                <section id="verbindung" class="content-section">
+                    <h2>5. Verbindung prüfen</h2>
+                    <p>Sobald Sie das Gerät in thermondo smart angelegt haben, können Sie die erfolgreiche Verbindung wie folgt überprüfen:</p>
+                    <ul>
+                        <li>Prüfen Sie, ob im thermondo smart Dashboard aktuelle Messwerte für Bezug und Einspeisung angezeigt werden.</li>
+                        <li><strong>EM24:</strong> Die Netzwerk-LEDs an der Ethernet-Buchse des Messgeräts sollten regelmäßig blinken (Datenverkehr).</li>
+                        <li><strong>EM3xx:</strong> Auf dem Display des EM3xx sollte bei aktiver Kommunikation das Telefonsymbol oder ein entsprechendes Kommunikations-Indikator-Symbol dauerhaft oder blinkend zu sehen sein.</li>
+                    </ul>
+                </section>
+
+                <!-- 6. Hilfe & Fehlerbehebung -->
+                <section id="hilfe" class="content-section">
+                    <h2>6. Hilfe &amp; Fehlerbehebung</h2>
+                    
+                    <h3>Häufige Probleme und Lösungen</h3>
+                    
+                    <p><strong>Problem: Das EM24 wird im Netzwerk nicht gefunden.</strong></p>
+                    <ul>
+                        <li><em>Lösung:</em> Prüfen Sie, ob das Ethernet-Kabel fest eingesteckt ist. Kontrollieren Sie in Ihrem Router, ob dem EM24 eine IP-Adresse zugewiesen wurde.</li>
+                    </ul>
+
+                    <p><strong>Problem: Keine Datenübertragung beim EM3xx.</strong></p>
+                    <ul>
+                        <li><em>Lösung:</em> Prüfen Sie die Polarität der RS485-Leitungen (A- und B+ dürfen nicht vertauscht sein).</li>
+                        <li><em>Lösung:</em> Stellen Sie sicher, dass der 120-Ohm-Abschlusswiderstand korrekt am letzten Gerät der Bus-Kette installiert ist.</li>
+                    </ul>
+
+                    <p><strong>Problem: Die Werte werden negativ oder fehlerhaft dargestellt.</strong></p>
+                    <ul>
+                        <li><em>Lösung:</em> Überprüfen Sie die korrekte Installationsrichtung der Stromwandler (P1 zu P2) bzw. den korrekten Anschluss der Phasen (L1, L2, L3).</li>
+                    </ul>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Interactive Animation Logic
+        const animStartBtn = document.getElementById('anim-start');
+        const animResetBtn = document.getElementById('anim-reset');
+        const animVisual = document.getElementById('anim-visual');
+        const animStatus = document.getElementById('anim-status');
+
+        let animTimeout;
+
+        const steps = [
+            { text: "🔌 Schritt 1: RS485-Leitungen vorbereiten...", status: "Status: Kabel abisolieren und bereitlegen." },
+            { text: "🔗 Schritt 2: A- an A und B+ an B anschließen...", status: "Status: Leitungen polungsrichtig mit dem Gateway verbinden." },
+            { text: "⚡ Schritt 3: 120-Ohm-Widerstand einsetzen...", status: "Status: Abschlusswiderstand an den Klemmen des EM3xx montieren." },
+            { text: "✅ Schritt 4: Verbindung steht!", status: "Status: Bus-Verbindung erfolgreich hergestellt und terminiert." }
+        ];
+
+        function runStep(index) {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                // Instantly show final state if user prefers reduced motion
+                animVisual.textContent = steps[steps.length - 1].text;
+                animStatus.textContent = steps[steps.length - 1].status;
+                return;
+            }
+
+            if (index < steps.length) {
+                animVisual.textContent = steps[index].text;
+                animStatus.textContent = steps[index].status;
+                animTimeout = setTimeout(() => runStep(index + 1), 2000);
+            }
+        }
+
+        animStartBtn.addEventListener('click', () => {
+            clearTimeout(animTimeout);
+            runStep(0);
+        });
+
+        animResetBtn.addEventListener('click', () => {
+            clearTimeout(animTimeout);
+            animVisual.textContent = "Bereit zum Starten...";
+            animStatus.textContent = "Status: Warte auf Start...";
+        });
+
+        // Handle prefers-reduced-motion initially
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            animVisual.textContent = steps[steps.length - 1].text;
+            animStatus.textContent = steps[steps.length - 1].status;
+        }
+    </script>
+<style>#tdFb{max-width:760px;margin:56px auto 40px;padding:24px;border:1px solid #e2e4e0;border-radius:12px;font-family:system-ui,-apple-system,sans-serif;background:#fafaf8}#tdFb h3{margin:0 0 4px;font-size:17px}#tdFb p{margin:0 0 14px;color:#6b7580;font-size:14px}#tdFb .f{background:#fff;border:1px solid #c9d0c9;border-radius:12px;padding:10px 14px;margin-right:8px;cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;gap:2px}#tdFb .f span{font-size:26px;line-height:1}#tdFb .f em{font-style:normal;font-size:11px;color:#6b7580}#tdFb .f[aria-pressed=true]{background:#ff5b29;border-color:#ff5b29}#tdFb .f[aria-pressed=true] em{color:#fff}#tdFb .ja{display:inline-block;padding:10px 18px;margin:0 10px 0 0;border:1px solid #c9d0c9;border-radius:999px;background:#fff;cursor:pointer;font-size:15px}#tdFb .ja[aria-pressed=true]{background:#14181f;border-color:#14181f;color:#fff}#tdFb textarea{width:100%;min-height:90px;margin-top:14px;padding:12px;font:inherit;border:1px solid #c9d0c9;border-radius:8px}#tdFb .send{margin-top:12px;padding:11px 22px;border:0;border-radius:999px;background:#14181f;color:#fff;font-size:15px;cursor:pointer}#tdFb hr{border:0;border-top:1px solid #e2e4e0;margin:20px 0}</style><section id="tdFb"><div id="tdForm"><h3>Konnten Sie Ihr Gerät verbinden?</h3><p>Ihre Antwort hilft uns, die Anleitung zu verbessern.</p><button class="ja" id="tdJa">Ja, hat geklappt</button><button class="ja" id="tdNein">Nein, ich brauche Hilfe</button><hr><h3>Wie zufrieden sind Sie mit dieser Anleitung?</h3><p>1 bedeutet gar nicht zufrieden, 5 bedeutet sehr zufrieden.</p><div id="tdSkala"><button class="f" data-w="1"><span>😠</span><em>1</em></button><button class="f" data-w="2"><span>🙁</span><em>2</em></button><button class="f" data-w="3"><span>😐</span><em>3</em></button><button class="f" data-w="4"><span>🙂</span><em>4</em></button><button class="f" data-w="5"><span>😀</span><em>5</em></button></div><div id="tdMore" hidden><textarea id="tdText" placeholder="Was hat gefehlt oder nicht funktioniert?"></textarea></div><div><button class="send" id="tdSend">Absenden</button></div></div><div id="tdDanke" hidden style="font-size:15px;color:#15703f">Vielen Dank für Ihre Rückmeldung.</div></section><script>(function(){var Z="https://script.google.com/a/macros/thermondo.de/s/AKfycbzPyaDVupUh9DrRfT5qGB3GI_AZeWHsppsRcsivbbHPVDHEmPZHTUFarQZ_rwMFPSHfiw/exec", F="1SG8woGHR98rDHK-bU1YGpIdNRmmplyd1", T="Carlo - Gavazzi EM24 (LAN)";var gel="",note=0;var ja=document.getElementById("tdJa"),nein=document.getElementById("tdNein"),more=document.getElementById("tdMore");ja.onclick=function(){gel="Ja";ja.setAttribute("aria-pressed","true");nein.setAttribute("aria-pressed","false");more.hidden=true;};nein.onclick=function(){gel="Nein";nein.setAttribute("aria-pressed","true");ja.setAttribute("aria-pressed","false");more.hidden=false;};[].forEach.call(document.querySelectorAll("#tdSkala .f"),function(b){b.onclick=function(){note=+b.dataset.w;[].forEach.call(document.querySelectorAll("#tdSkala .f"),function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});if(note<=3)more.hidden=false;};});document.getElementById("tdSend").onclick=function(){if(!gel&&!note)return;var q=Z+"?fb=1&file="+encodeURIComponent(F)+"&titel="+encodeURIComponent(T)+"&geloest="+encodeURIComponent(gel)+"&note="+note+"&text="+encodeURIComponent(document.getElementById("tdText").value||"");var i=new Image();i.src=q;document.getElementById("tdForm").hidden=true;document.getElementById("tdDanke").hidden=false;};})();</script></body>
+</html>
